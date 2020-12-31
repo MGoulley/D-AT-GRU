@@ -26,7 +26,6 @@ __email__ = "annis@aueb.gr"
 
 try:
     import xml.etree.ElementTree as ET, getopt, logging, sys, random, re, copy
-    from xml.sax.saxutils import escape
 except:
     sys.exit('Some package is missing... Perhaps <re>?')
 
@@ -83,9 +82,6 @@ def validate(filename):
                     aspects.append(Aspect('', '', []).create(a).term)
     return elements, aspects
 
-
-fix = lambda text: escape(text.encode('utf8')).replace('\"', '&quot;')
-'''Simple fix for writing out text.'''
 
 # Dice coefficient
 def dice(t1, t2, stopwords=[]):
@@ -186,21 +182,21 @@ class Corpus:
         return train, test
 
     def write_out(self, filename, instances, short=True):
-        with open(filename, 'w') as o:
+        with open(filename, 'w', encoding="utf8") as o:
             o.write('<sentences>\n')
             for i in instances:
                 o.write('\t<sentence id="%s">\n' % (i.id))
-                o.write('\t\t<text>%s</text>\n' % fix(i.text))
+                o.write('\t\t<text>%s</text>\n' % (i.text))
                 o.write('\t\t<aspectTerms>\n')
                 if not short:
                     for a in i.aspect_terms:
                         o.write('\t\t\t<aspectTerm term="%s" polarity="%s" from="%s" to="%s"/>\n' % (
-                            fix(a.term), a.polarity, a.offsets['from'], a.offsets['to']))
+                            a.term, a.polarity, a.offsets['from'], a.offsets['to']))
                 o.write('\t\t</aspectTerms>\n')
                 o.write('\t\t<aspectCategories>\n')
                 if not short:
                     for c in i.aspect_categories:
-                        o.write('\t\t\t<aspectCategory category="%s" polarity="%s"/>\n' % (fix(c.term), c.polarity))
+                        o.write('\t\t\t<aspectCategory category="%s" polarity="%s"/>\n' % (c.term, c.polarity))
                 o.write('\t\t</aspectCategories>\n')
                 o.write('\t</sentence>\n')
             o.write('</sentences>')
